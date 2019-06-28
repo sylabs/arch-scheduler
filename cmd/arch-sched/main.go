@@ -38,6 +38,8 @@ func main() {
 }
 
 func handleFilter(w http.ResponseWriter, req *http.Request) {
+	log.Println("Got filter request!")
+
 	w.Header().Set("Content-Type", "application/json")
 	resp := json.NewEncoder(w)
 
@@ -50,6 +52,7 @@ func handleFilter(w http.ResponseWriter, req *http.Request) {
 		})
 		return
 	}
+	log.Printf("Request body: %v", extenderArgs)
 
 	extenderFilterResult, err := filter(req.Context(), extenderArgs)
 	if err != nil {
