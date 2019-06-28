@@ -118,7 +118,8 @@ func filter(ctx context.Context, args schedulerapi.ExtenderArgs) (*schedulerapi.
 	// todo parallelize this?
 	imgArch := *img.Architecture
 	for _, node := range args.Nodes.Items {
-		nodeArch := node.Labels["kubernetes.io/arch"]
+
+		nodeArch := node.Status.NodeInfo.Architecture
 		if imgArch == nodeArch {
 			filteredNodes = append(filteredNodes, node)
 		} else {
