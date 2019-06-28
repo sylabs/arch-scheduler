@@ -5,6 +5,6 @@ clientConnection:
 algorithmSource:
   policy:
     file:
-      path: "/root/config/scheduler-extender-policy.json"
-      # YAML not supported yet
+      # YAML should be supported
       # https://github.com/kubernetes/kubernetes/issues/75852
+      path: "deploy/arch-scheduler-policy.yaml"
