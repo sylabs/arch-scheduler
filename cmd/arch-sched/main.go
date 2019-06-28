@@ -34,6 +34,7 @@ func main() {
 		port = defaultPort
 	}
 	http.HandleFunc("/filter", handleFilter)
+	log.Println("Starting extender...")
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
 }
 
