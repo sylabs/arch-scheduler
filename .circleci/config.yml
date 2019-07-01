@@ -147,9 +147,7 @@ workflows:
           requires:
             - get_source
       - publish:
-          context:
-            - scs-production
-            - signing
+          context: scs-production
           filters:
             tags:
               only: /.*/
