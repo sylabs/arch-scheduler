@@ -148,5 +148,5 @@ workflows:
                 - master
                 - staging
           requires:
-            - build
-            - test
+            - build_source
+            - unit_test
