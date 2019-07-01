@@ -114,7 +114,7 @@ jobs:
               TAG=${CIRCLE_TAG}
             fi
 
-            cd $GOPATH/src/github.com/sylabs/arch-scheduler
+            cd arch-scheduler
             cat > push.sh \<<EOF
             #!/usr/bin/expect -f
             set timeout -1
