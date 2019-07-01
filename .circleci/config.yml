@@ -126,7 +126,6 @@ jobs:
             chmod +x push.sh
             ./push.sh
 
-
 workflows:
   version: 2
   build_and_test:
