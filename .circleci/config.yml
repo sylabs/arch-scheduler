@@ -37,19 +37,8 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          name: Setup environment
-          command: |
-            echo 'export GOPATH=$HOME/go' >> $BASH_ENV
-            echo 'export GOROOT=/usr/local/go' >> $BASH_ENV
-            echo 'export PATH=$PATH:$GOPATH/bin:$GOROOT/bin' >> $BASH_ENV
-            echo 'export PATH=$PATH:/usr/local/libexec/singularity/bin/' >> $BASH_ENV
-      - run:
-          name: Update go to 1.12
-          working_directory: /tmp
-          command: |
-            wget https://dl.google.com/go/go1.12.linux-amd64.tar.gz
-            sudo rm -rf /usr/local/go
-            sudo tar -C /usr/local -xzf go1.12.linux-amd64.tar.gz
+          name: Install linter
+          command: make linter-install
       - run:
           name: Run tests
           command: make test
