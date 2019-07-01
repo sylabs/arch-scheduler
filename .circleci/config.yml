@@ -135,13 +135,13 @@ workflows:
             tags:
               only: /.*/
       - unit_test:
-          filter:
+          filters:
             tags:
               only: /.*/
           requires:
             - get_source
       - build_source:
-          filter:
+          filters:
             tags:
               only: /.*/
           requires:
