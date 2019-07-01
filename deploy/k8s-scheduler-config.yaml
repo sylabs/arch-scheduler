@@ -7,7 +7,6 @@ clientConnection:
   kubeconfig: "/etc/kubernetes/scheduler.conf"
   qps: 50
 algorithmSource:
-  provider: DefaultProvider
   policy:
     file:
       # YAML should be supported

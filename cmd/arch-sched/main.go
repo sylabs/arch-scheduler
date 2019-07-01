@@ -101,7 +101,8 @@ func filter(ctx context.Context, args schedulerapi.ExtenderArgs) (*schedulerapi.
 		return nil, fmt.Errorf("could not create library client: %v", err)
 	}
 
-	img, found, err := client.GetImage(ctx, cont.Image)
+	image := strings.TrimPrefix(cont.Image, sylabsImagePrefix)
+	img, found, err := client.GetImage(ctx, image)
 	if err != nil {
 		return nil, fmt.Errorf("could not get library image info: %v", err)
 	}
