@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sif-scheduler-extender
+spec:
+  containers:
+    - name: sif-scheduler-extender
+      image: cloud.sylabs.io/sylabs/slurm/arch-scheduler
+      ports:
+        - containerPort: 8888
+      env:
+        - name: PORT
+          value: 8888
+  nodeName: k8s-master
+
+
