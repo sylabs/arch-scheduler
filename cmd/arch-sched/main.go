@@ -16,7 +16,7 @@ import (
 
 const (
 	defaultPort       = "8888"
-	sylabsImagePrefix = "cloud.sylabs.io"
+	sylabsImagePrefix = "cloud.sylabs.io/"
 )
 
 var version = "unknown"
@@ -53,7 +53,9 @@ func handleFilter(w http.ResponseWriter, req *http.Request) {
 		})
 		return
 	}
-	log.Printf("Request body: %v", extenderArgs)
+	enc := json.NewEncoder(os.Stdout)
+	enc.SetIndent("\n", "")
+	enc.Encode(extenderArgs)
 
 	extenderFilterResult, err := filter(req.Context(), extenderArgs)
 	if err != nil {
