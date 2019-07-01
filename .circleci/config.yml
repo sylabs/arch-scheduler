@@ -1,0 +1,69 @@
+version: 2.1
+
+orbs:
+  codecov: codecov/codecov@1.0.4
+
+defaults: &defaults
+  working_directory: ~/arch-scheduler
+  docker:
+    - image: golang:1.12-stretch
+
+jobs:
+  get_source:
+    <<: *defaults
+    steps:
+      - checkout
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - arch-scheduler
+
+  build_source:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Build source
+          command: make
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - arch-scheduler/bin
+
+  unit_test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Setup environment
+          command: |
+            echo 'export GOPATH=$HOME/go' >> $BASH_ENV
+            echo 'export GOROOT=/usr/local/go' >> $BASH_ENV
+            echo 'export PATH=$PATH:$GOPATH/bin:$GOROOT/bin' >> $BASH_ENV
+            echo 'export PATH=$PATH:/usr/local/libexec/singularity/bin/' >> $BASH_ENV
+      - run:
+          name: Update go to 1.12
+          working_directory: /tmp
+          command: |
+            wget https://dl.google.com/go/go1.12.linux-amd64.tar.gz
+            sudo rm -rf /usr/local/go
+            sudo tar -C /usr/local -xzf go1.12.linux-amd64.tar.gz
+      - run:
+          name: Run tests
+          command: make test
+      - codecov/upload:
+          file: cover.out
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - get_source
+      - unit_test:
+          requires:
+            - get_source
+      - build_source:
+          requires:
+            - get_source
