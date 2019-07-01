@@ -130,15 +130,26 @@ workflows:
   version: 2
   build_and_test:
     jobs:
-      - get_source
+      - get_source:
+          filters:
+            tags:
+              only: /.*/
       - unit_test:
+          filter:
+            tags:
+              only: /.*/
           requires:
             - get_source
       - build_source:
+          filter:
+            tags:
+              only: /.*/
           requires:
             - get_source
       - publish:
-          context: scs-production
+          context:
+            - scs-production
+            - signing
           filters:
             tags:
               only: /.*/
