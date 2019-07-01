@@ -45,14 +45,116 @@ jobs:
       - codecov/upload:
           file: cover.out
 
+  publish:
+    machine: true
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Setup environment
+          command: |
+            echo 'export GOPATH=$HOME/go' >> $BASH_ENV
+            echo 'export GOROOT=/usr/local/go' >> $BASH_ENV
+            echo 'export PATH=$PATH:$GOPATH/bin:$GOROOT/bin' >> $BASH_ENV
+            echo 'export PATH=$PATH:/usr/local/libexec/singularity/bin/' >> $BASH_ENV
+      - run:
+          name: Update go to 1.12
+          working_directory: /tmp
+          command: |
+            wget https://dl.google.com/go/go1.12.linux-amd64.tar.gz
+            sudo rm -rf /usr/local/go
+            sudo tar -C /usr/local -xzf go1.12.linux-amd64.tar.gz
+      - run:
+          name: Install prerequisities
+          command: |
+            sudo apt-get update -y
+            sudo apt-get install -y expect build-essential libssl-dev uuid-dev squashfs-tools libseccomp-dev libgpgme11-dev
+      - run:
+          name: Install singularity
+          command: |
+            git clone https://github.com/sylabs/singularity.git $GOPATH/src/github.com/sylabs/singularity
+            cd $GOPATH/src/github.com/sylabs/singularity
+            ./mconfig -p /usr/local
+            make -j$(nproc) -C ./builddir
+            sudo make -C ./builddir install
+      - run:
+          name: Authorize remote library
+          command: |
+            mkdir $HOME/.singularity
+            touch $HOME/.singularity/remote.yaml
+            echo $E2E_AUTH_TOKEN > token
+            singularity remote login --tokenfile token SylabsCloud
+            singularity keys pull $SYLABS_KEY_FINGERPRINT
+            echo $SYLABS_KEY_BASE64 | sed 's/ //g' | base64 -d - > key
+            cat > import.sh \<<EOF
+            #!/usr/bin/expect -f
+            set timeout -1
+            spawn singularity keys import key
+            expect "Enter your old password : "
+            send -- "\r"
+            expect "Enter a new password for this key : "
+            send -- "\r"
+            expect  "Retype your passphrase : "
+            send -- "\r"
+            expect eof
+            EOF
+            chmod +x import.sh
+            ./import.sh
+      - run:
+          name: Publish images
+          command: |
+            TAG=latest
+            if [ "${CIRCLE_BRANCH}" != "master" ]
+            then
+              TAG=${CIRCLE_BRANCH}
+            fi
+
+            if [ "${CIRCLE_TAG}" != "" ]
+            then
+              TAG=${CIRCLE_TAG}
+            fi
+
+            cd ~/arch-scheduler
+            cat > push.sh \<<EOF
+            #!/usr/bin/expect -f
+            set timeout -1
+            spawn make push TAG=${TAG}
+            expect "Enter key passphrase : "
+            send -- "\r"
+            expect eof
+            EOF
+            chmod +x push.sh
+            ./push.sh
+
 workflows:
   version: 2
   build_and_test:
     jobs:
-      - get_source
+      - get_source:
+          filters:
+            tags:
+              only: /.*/
       - unit_test:
+          filters:
+            tags:
+              only: /.*/
           requires:
             - get_source
       - build_source:
+          filters:
+            tags:
+              only: /.*/
           requires:
             - get_source
+      - publish:
+          context: scs-production
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              only:
+                - master
+                - staging
+          requires:
+            - build_source
+            - unit_test

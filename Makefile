@@ -3,6 +3,7 @@ V := @
 
 BIN_DIR := ./bin
 EXTENDER := $(BIN_DIR)/arch-sched
+SIF_FILE := arch-scheduler
 
 all: $(EXTENDER)
 
@@ -45,3 +46,10 @@ dep:
 	$(V)go mod tidy
 	$(V)go mod vendor
 
+.PHONY: push
+push: TAG=latest
+push:
+	@echo " PUSH" ${SIF_FILE}:${TAG}
+	$(V)sudo singularity build sif/${SIF_FILE}.sif sif/${SIF_FILE}
+	$(V)singularity sign sif/${SIF_FILE}.sif
+	$(V)singularity push sif/${SIF_FILE}.sif library://library/slurm/${SIF_FILE}:${TAG}
