@@ -53,9 +53,6 @@ func handleFilter(w http.ResponseWriter, req *http.Request) {
 		})
 		return
 	}
-	enc := json.NewEncoder(os.Stdout)
-	enc.SetIndent("\n", "")
-	enc.Encode(extenderArgs)
 
 	extenderFilterResult, err := filter(req.Context(), extenderArgs)
 	if err != nil {
@@ -104,6 +101,10 @@ func filter(ctx context.Context, args schedulerapi.ExtenderArgs) (*schedulerapi.
 	}
 
 	image := strings.TrimPrefix(cont.Image, sylabsImagePrefix)
+	i := strings.LastIndexByte(image, ':')
+	if i == -1 {
+		image = image + ":latest"
+	}
 	img, found, err := client.GetImage(ctx, image)
 	if err != nil {
 		return nil, fmt.Errorf("could not get library image info: %v", err)
@@ -125,7 +126,6 @@ func filter(ctx context.Context, args schedulerapi.ExtenderArgs) (*schedulerapi.
 	// todo parallelize this?
 	imgArch := *img.Architecture
 	for _, node := range args.Nodes.Items {
-
 		nodeArch := node.Status.NodeInfo.Architecture
 		if imgArch == nodeArch {
 			filteredNodes = append(filteredNodes, node)
