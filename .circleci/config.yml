@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 
 orbs:
   codecov: codecov/codecov@1.0.4
@@ -86,7 +86,7 @@ jobs:
             singularity remote login --tokenfile token SylabsCloud
             singularity keys pull $SYLABS_KEY_FINGERPRINT
             echo $SYLABS_KEY_BASE64 | sed 's/ //g' | base64 -d - > key
-            cat > import.sh <<EOF
+            cat > import.sh \<<EOF
             #!/usr/bin/expect -f
             set timeout -1
             spawn singularity keys import key
@@ -115,7 +115,7 @@ jobs:
             fi
 
             cd $GOPATH/src/github.com/sylabs/arch-scheduler
-            cat > push.sh <<EOF
+            cat > push.sh \<<EOF
             #!/usr/bin/expect -f
             set timeout -1
             spawn make push TAG=${TAG}
