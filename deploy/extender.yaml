@@ -5,12 +5,20 @@ metadata:
 spec:
   containers:
     - name: sif-scheduler-extender
-      image: cloud.sylabs.io/sylabs/slurm/arch-scheduler
+      image: cloud.sylabs.io/library/slurm/arch-scheduler
       ports:
         - containerPort: 8888
       env:
         - name: PORT
-          value: 8888
-  nodeName: k8s-master
+          value: "8888"
+  affinity:
+    podAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - namespaces:
+            - kube-system
+          topologyKey: kubernetes.io/hostname
+          labelSelector:
+            matchLabels:
+              component: kube-scheduler
 
 

@@ -30,8 +30,11 @@ spec:
         - mountPath: /etc/kubernetes/scheduler.conf
           name: kubeconfig
           readOnly: true
-        - mountPath: /etc/kubernetes/scheduler
+        - mountPath: /etc/kubernetes/scheduler/config.yaml
           name: scheduler-config
+          readOnly: true
+        - mountPath: /etc/kubernetes/scheduler/policy.yaml
+          name: scheduler-policy
           readOnly: true
   hostNetwork: true
   priorityClassName: system-cluster-critical
@@ -41,10 +44,10 @@ spec:
         path: /etc/kubernetes/scheduler.conf
         type: FileOrCreate
     - name: scheduler-config
-      configMap:
-        name: scheduler-config
-        items:
-          - key: policy
-            path: policy.yaml
-          - key: config
-            path: config.yaml
+      hostPath:
+        path: /etc/kubernetes/scheduler/config.yaml
+        type: File
+    - name: scheduler-policy
+      hostPath:
+        path: /etc/kubernetes/scheduler/policy.yaml
+        type: File
