@@ -9,9 +9,7 @@ clientConnection:
 algorithmSource:
   policy:
     file:
-      # YAML should be supported
-      # https://github.com/kubernetes/kubernetes/issues/75852
-      path: "deploy/arch-scheduler-policy.yaml"
+      path: "/etc/kubernetes/scheduler/policy.yaml"
 bindTimeoutSeconds: 600
 disablePreemption: false
 enableContentionProfiling: false

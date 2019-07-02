@@ -5,3 +5,4 @@ extenders:
     filterVerb: filter
     enableHttps: false
     nodeCacheCapable: false
+    ignorable: true
