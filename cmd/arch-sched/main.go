@@ -94,8 +94,7 @@ func filter(ctx context.Context, args schedulerapi.ExtenderArgs) (*schedulerapi.
 		}, nil
 	}
 
-	config := &library.Config{}
-	client, err := library.NewClient(config)
+	client, err := library.NewClient(nil)
 	if err != nil {
 		return nil, fmt.Errorf("could not create library client: %v", err)
 	}
